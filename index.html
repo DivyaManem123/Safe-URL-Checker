@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>URL Analyzer</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom right, #2c3e50, #3498db);
+            margin: 0;
+            padding: 2em;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 2em;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #34495e;
+            margin-bottom: 1.5em;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+            margin-bottom: 2em;
+        }
+
+        label {
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            padding: 0.75em;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        input[type="submit"] {
+            padding: 0.75em;
+            font-size: 1em;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            background-color: #fff;
+            padding: 1.5em;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+        }
+
+        .phishing {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .legit {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .safe {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+
+        .unsafe {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>URL Analyzer</h1>
+        <form method="POST" action="/analyze">
+            <input type="text" name="url" placeholder="Enter URL to check" required>
+            <input type="submit" value="Check">
+        </form>
+
+        {% if url %}
+            <div class="result">
+                <p><strong>URL:</strong> {{ url }}</p>
+                <p><strong>Status:</strong> 
+                    {% if result == "Phishing" %}
+                        <span class="phishing">Phishing</span>
+                    {% else %}
+                        <span class="legit">Legitimate</span>
+                    {% endif %}
+                </p>
+
+                {% if result == "Phishing" %}
+                    {% if safe_suggestion %}
+                        <p><strong>Suggested Safe Link:</strong> 
+                            <a href="{{ safe_suggestion }}" target="_blank">{{ safe_suggestion }}</a>
+                        </p>
+                    {% endif %}
+                {% endif %}
+
+                {% if result == "Legitimate" %}
+                    {% if keywords %}
+                        <p><strong>Suspicious Keywords Found:</strong> {{ keywords | join(', ') }}</p>
+                    {% endif %}
+
+                    {% if suspicious_links %}
+                        <p><strong>Suspicious Links:</strong></p>
+                        <ul>
+                            {% for link in suspicious_links %}
+                                <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
